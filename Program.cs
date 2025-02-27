@@ -1,32 +1,18 @@
-namespace ictpizza
-{
-    public class Program
-    {
-        public static void Main(string[] args)
-        {
-            var builder = WebApplication.CreateBuilder(args);
+using Microsoft.EntityFrameworkCore;
+using PizzaApp.Models;
 
-            // Add services to the container.
-            builder.Services.AddControllersWithViews();
+var builder = WebApplication.CreateBuilder(args);
 
-            var app = builder.Build();
+// Add DbContext
+builder.Services.AddDbContext<PizzaDbContext>(options =>
+	options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-            // Configure the HTTP request pipeline.
-            if (!app.Environment.IsDevelopment())
-            {
-                app.UseExceptionHandler("/Home/Error");
-            }
-            app.UseStaticFiles();
+builder.Services.AddControllers();
 
-            app.UseRouting();
+var app = builder.Build();
 
-            app.UseAuthorization();
+app.UseRouting();
+app.UseAuthorization();
+app.MapControllers();
 
-            app.MapControllerRoute(
-                name: "default",
-                pattern: "{controller=Home}/{action=Index}/{id?}");
-
-            app.Run();
-        }
-    }
-}
+app.Run();
