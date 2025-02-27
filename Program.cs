@@ -1,18 +1,39 @@
 using Microsoft.EntityFrameworkCore;
 using PizzaApp.Models;
 
-var builder = WebApplication.CreateBuilder(args);
+namespace ictpizza
+{
+	public class Program
+	{
+		public static void Main(string[] args)
+		{
+			var builder = WebApplication.CreateBuilder(args);
 
-// Add DbContext
-builder.Services.AddDbContext<PizzaDbContext>(options =>
-	options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+			builder.Services.AddDbContext<PizzaDbContext>(options =>
+				options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-builder.Services.AddControllers();
+			// Add services to the container.
+			builder.Services.AddControllersWithViews();
+			builder.Services.AddControllers();
 
-var app = builder.Build();
+			var app = builder.Build();
 
-app.UseRouting();
-app.UseAuthorization();
-app.MapControllers();
+			// Configure the HTTP request pipeline.
+			if (!app.Environment.IsDevelopment())
+			{
+				app.UseExceptionHandler("/Home/Error");
+			}
+			app.UseStaticFiles();
 
-app.Run();
+			app.UseRouting();
+
+			app.UseAuthorization();
+
+			app.MapControllerRoute(
+				name: "default",
+				pattern: "{controller=Home}/{action=Index}/{id?}");
+
+			app.Run();
+		}
+	}
+}
